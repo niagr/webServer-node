@@ -43,7 +43,7 @@ function getParts (req) {
   let parts = []
   let copy = req.body
   while (copy.indexOf('--' + boundary + '--') > 0) {
-    let part = copy.slice(boundary.length + 4, copy.indexOf('--', boundary.length + 4))
+    let part = copy.slice(boundary.length + 4, copy.indexOf('--' + boundary, boundary.length + 4))
     parts.push(part)
     copy = copy.slice(boundary.length + 4 + part.length)
   }

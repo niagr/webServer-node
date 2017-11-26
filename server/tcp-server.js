@@ -42,9 +42,9 @@ function handleDataEvent (socket) {
   let obj = {}
   socket.on('data', (data) => {
     if (receivedPart) {
-      bodyBuff = Buffer.concat([bodyBuff, data], bodyBuff.length + data.length)
+      bodyBuff = Buffer.concat([bodyBuff, data])
     }
-    reqBuff = Buffer.concat([reqBuff, data], reqBuff.length + data.length)
+    reqBuff = Buffer.concat([reqBuff, data])
     if (reqBuff.includes('\r\n\r\n')) {
       if (!receivedPart) {
         let [header, body] = getHeaderAndBody(reqBuff)
@@ -53,8 +53,12 @@ function handleDataEvent (socket) {
         receivedPart = true
       }
       if (obj.Headers['Content-Length'] === undefined || parseInt(obj.Headers['Content-Length']) === bodyBuff.length) {
-        reqBuff = handleRequest(obj, socket, bodyBuff)
+        handleRequest(obj, socket, bodyBuff)
+        // reset state for next request
+        reqBuff = Buffer.from([])
+        bodyBuff = Buffer.from([])
         receivedPart = false
+        obj = {}
       }
     }
   })
